@@ -37,7 +37,7 @@ function numberToWords(amount) {
   return parts.join(' ').trim();
 }
 
-const receiptTemplate = (order, items, user, bankDetails) => {
+const receiptTemplateV2 = (order, items, user, bankDetails) => {
   const customerName = user?.name || `User #${order.userId}`;
 
   return `
@@ -50,7 +50,7 @@ const receiptTemplate = (order, items, user, bankDetails) => {
 
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      color: #222;
+      color: #2b2b2b;
       background: #fff;
       font-size: 12px;
     }
@@ -58,44 +58,64 @@ const receiptTemplate = (order, items, user, bankDetails) => {
     .sheet { padding: 0 0 40px 0; }
 
     .banner {
-      background: #a9a575;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+    }
+    .banner-left {
+      background: #1e3a5f;
       color: #fff;
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 18px 24px;
+      gap: 14px;
+      padding: 20px 24px;
+    }
+    .banner-right {
+      background: #e0653f;
+      color: #fff;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      min-width: 180px;
     }
 
     .logo-badge {
-      width: 56px;
-      height: 56px;
+      width: 50px;
+      height: 50px;
       flex-shrink: 0;
-      border-radius: 50%;
-      background: #fff;
+      border-radius: 10px;
+      background: #e0653f;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.4);
     }
+    .logo-badge svg { width: 26px; height: 26px; }
 
-    .logo-badge svg { width: 30px; height: 30px; }
+    .shop-name { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; }
+    .shop-sub { font-size: 11px; margin-top: 3px; opacity: 0.85; }
 
-    .banner .brand-text { text-align: left; }
-    .banner .shop-name { font-size: 21px; font-weight: 700; letter-spacing: 0.5px; }
-    .banner .shop-sub { font-size: 11px; margin-top: 4px; opacity: 0.95; }
+    .banner-right .tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9; }
+    .banner-right .num { font-size: 22px; font-weight: 800; margin-top: 4px; }
+    .banner-right .date { font-size: 11px; margin-top: 4px; opacity: 0.9; }
 
     .doc-title {
       text-align: center;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      color: #7d7a4f;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #1e3a5f;
       padding: 14px 0 10px;
+      border-bottom: 2px solid #f0d9d0;
     }
 
     .container { padding: 0 32px; }
 
     .bar {
-      background: #a9a575;
+      background: #1e3a5f;
       color: #fff;
       font-size: 11px;
       font-weight: 700;
@@ -104,40 +124,41 @@ const receiptTemplate = (order, items, user, bankDetails) => {
       justify-content: space-between;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      margin-top: 24px;
     }
 
     .bill-row {
       display: flex;
       justify-content: space-between;
-      border: 1px solid #ddd;
+      border: 1px solid #e2e6ea;
       border-top: none;
       padding: 10px 12px 14px;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
     }
     .bill-row .left p { font-size: 13px; margin-top: 4px; }
-    .bill-row .right { text-align: right; font-size: 12px; color: #444; }
+    .bill-row .right { text-align: right; font-size: 12px; color: #555; }
     .bill-row .right div { margin-top: 3px; }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0 4px; }
     thead th {
-      background: #a9a575;
+      background: #1e3a5f;
       color: #fff;
       text-transform: uppercase;
       font-size: 10px;
       letter-spacing: 0.5px;
-      padding: 8px 10px;
+      padding: 9px 10px;
       text-align: left;
-      border: 1px solid #a9a575;
     }
     thead th.num, tbody td.num { text-align: right; }
     tbody td {
-      padding: 8px 10px;
-      border: 1px solid #ddd;
+      padding: 9px 10px;
+      border-bottom: 1px solid #eceff2;
       font-size: 12px;
     }
+    tbody tr:nth-child(even) { background: #f9fafb; }
     tfoot td {
-      padding: 8px 10px;
-      border: 1px solid #ddd;
+      padding: 9px 10px;
+      border-top: 2px solid #1e3a5f;
       font-weight: 700;
       font-size: 12px;
     }
@@ -147,61 +168,70 @@ const receiptTemplate = (order, items, user, bankDetails) => {
       gap: 16px;
       margin: 20px 0;
     }
-    .info-two-col .box { flex: 1; border: 1px solid #ddd; }
-    .info-two-col .box .bar { font-size: 10px; }
+    .info-two-col .box { flex: 1; border: 1px solid #e2e6ea; border-radius: 6px; overflow: hidden; }
+    .info-two-col .box .bar { margin-top: 0; font-size: 10px; background: #e0653f; }
     .info-two-col .box .content { padding: 10px 12px; font-size: 12px; }
     .info-two-col .box .content div { display: flex; justify-content: space-between; padding: 3px 0; }
-    .info-two-col .box .content div.grand { font-weight: 700; border-top: 1px solid #eee; margin-top: 4px; padding-top: 6px; }
+    .info-two-col .box .content div.grand { font-weight: 700; color: #1e3a5f; border-top: 1px solid #f0d9d0; margin-top: 4px; padding-top: 6px; }
 
-    .terms-box { border: 1px solid #ddd; margin-bottom: 20px; }
+    .terms-box { border: 1px solid #e2e6ea; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+    .terms-box .bar { margin-top: 0; background: #e0653f; }
     .terms-box .content { padding: 10px 12px; font-size: 12px; line-height: 1.6; }
 
     .bank-sign-row { display: flex; gap: 16px; margin-bottom: 28px; }
-    .bank-box { flex: 1; border: 1px solid #ddd; }
+    .bank-box { flex: 1; border: 1px solid #e2e6ea; border-radius: 6px; overflow: hidden; }
+    .bank-box .bar { margin-top: 0; background: #e0653f; }
     .bank-box .content { padding: 12px; font-size: 11px; line-height: 1.8; display: flex; gap: 14px; align-items: center; }
     .qr-placeholder {
       width: 70px; height: 70px; flex-shrink: 0;
-      border: 1px dashed #bbb;
+      border: 1px dashed #e0653f;
       display: flex; align-items: center; justify-content: center;
-      font-size: 8px; color: #999; text-align: center;
+      font-size: 8px; color: #e0653f; text-align: center;
+      border-radius: 6px;
     }
 
-    .sign-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px; }
+    .sign-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px; border: 1px solid #e2e6ea; border-radius: 6px; }
     .sign-box .stamp {
       width: 100px; height: 60px;
-      border: 2px solid #a9a575;
-      border-radius: 6px;
+      border: 2px solid #1e3a5f;
+      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      color: #a9a575; font-weight: 700; font-size: 13px;
+      color: #1e3a5f; font-weight: 700; font-size: 12px;
       margin-bottom: 8px;
     }
     .sign-box .label { font-size: 11px; color: #555; }
 
     .ack {
-      border-top: 2px dashed #bbb;
+      border-top: 2px dashed #e0653f;
       margin-top: 12px;
       padding-top: 20px;
     }
-    .ack-title { text-align: center; font-size: 13px; font-weight: 700; color: #7d7a4f; margin-bottom: 4px; }
-    .ack-shop { text-align: center; font-size: 15px; font-weight: 700; color: #a9a575; margin-bottom: 16px; }
+    .ack-title { text-align: center; font-size: 13px; font-weight: 700; color: #e0653f; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ack-shop { text-align: center; font-size: 16px; font-weight: 700; color: #1e3a5f; margin-bottom: 16px; }
     .ack-row { display: flex; justify-content: space-between; }
-    .ack-row .col h5 { font-size: 10px; text-transform: uppercase; color: #a9a575; margin-bottom: 6px; }
+    .ack-row .col h5 { font-size: 10px; text-transform: uppercase; color: #e0653f; margin-bottom: 6px; }
     .ack-row .col p, .ack-row .col div { font-size: 12px; line-height: 1.6; }
-    .ack-row .sign-line { margin-top: 40px; border-top: 1px solid #333; width: 200px; text-align: center; font-size: 10px; padding-top: 4px; color: #666; }
+    .ack-row .sign-line { margin-top: 40px; border-top: 1px solid #2b2b2b; width: 200px; text-align: center; font-size: 10px; padding-top: 4px; color: #555; }
   </style>
 </head>
 <body>
   <div class="sheet">
     <div class="banner">
-      <div class="logo-badge">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 4C9.5 2.5 6 2 3 3v14c3-1 6.5-0.5 9 1 2.5-1.5 6-2 9-1V3c-3-1-6.5-0.5-9 1z" fill="#a9a575" stroke="#a9a575" stroke-width="0.5"/>
-          <path d="M12 4v14" stroke="#fff" stroke-width="1"/>
-        </svg>
+      <div class="banner-left">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4C9.5 2.5 6 2 3 3v14c3-1 6.5-0.5 9 1 2.5-1.5 6-2 9-1V3c-3-1-6.5-0.5-9 1z" fill="#fff"/>
+          </svg>
+        </div>
+        <div>
+          <div class="shop-name">BookHive</div>
+          <div class="shop-sub">12 Library Lane, Book District &nbsp;|&nbsp; +91-00000-00000</div>
+        </div>
       </div>
-      <div class="brand-text">
-        <div class="shop-name">BookHive</div>
-        <div class="shop-sub">Address: 12 Library Lane, Book District &nbsp;|&nbsp; Ph. no.: +91-00000-00000</div>
+      <div class="banner-right">
+        <div class="tag">Receipt No.</div>
+        <div class="num">#${String(order.id).padStart(4, '0')}</div>
+        <div class="date">${new Date(order.orderDate).toLocaleDateString()}</div>
       </div>
     </div>
 
@@ -329,4 +359,4 @@ const receiptTemplate = (order, items, user, bankDetails) => {
 `;
 };
 
-export default receiptTemplate;
+export default receiptTemplateV2;

@@ -5,7 +5,7 @@ import path from "path";
 import redisClient from "../config/redisConfig.js"; //connection
 import OrderModel from "../models/order.model.js";
 import { BookModel, UserModel, BankDetailsModel } from "../models/index.js";
-import receiptTemplate from "../templates/receipt.template.js";
+import receiptTemplate from "../templates/receipt.template.v2.js";
 
 
 const RECEIPT_DIR = path.resolve("receipts");
