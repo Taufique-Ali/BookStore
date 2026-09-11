@@ -56,6 +56,21 @@ const getAllBooks = async (req, res) => {
     }
 };
 
+const getBookListPdf = async (req, res) => {
+    try {
+        const shopId = req.user.userId;
+        const pdfBuffer = await BookService.generateBookListPdf(shopId);
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="book-list.pdf"',
+            'Content-Length': pdfBuffer.length,
+        });
+        res.status(200).send(pdfBuffer);
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Internal Server Error' });
+    }
+};
+
 const updateBook = async (req, res) => {
     try {
         const { bookId } = req.params;
@@ -98,6 +113,7 @@ export {
     createBook,
     getBookById,
     getAllBooks,
+    getBookListPdf,
     updateBook,
     deleteBook
 };
